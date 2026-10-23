@@ -9,7 +9,7 @@
       "description": "Deleting or replacing a resource needs approval",
       "provider_args": {
         "operation_type": "action",
-        "terraform_resource_type": "*"
+        "terraform_resource_type": "terraform_data"
       },
       "condition": {
         "type": "NotEquals",

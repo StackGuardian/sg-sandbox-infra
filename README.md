@@ -56,7 +56,7 @@ Each template has its input form in `schemas/input_schema.json` and `schemas/ui_
 
 | Policy | Rule | Action | Scope |
 |---|---|---|---|
-| `approve-destructive-changes` | No planned `delete` action, which includes replacements | Approval required | Group `platform-prod` |
+| `approve-destructive-changes` | No planned `delete` action on a `terraform_data` resource, which includes replacements | Approval required | Group `platform-prod` |
 | `deny-public-ingress` | `input.public_ingress` must be `false` on every resource that sets it | Fail | Group `platform-ops` |
 
 See [`policies/README.md`](policies/README.md) for how the rules read the plan, and how to run them locally with Tirith.
