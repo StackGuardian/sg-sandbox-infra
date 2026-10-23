@@ -1,0 +1,40 @@
+{
+  "ui:order": [
+    "location",
+    "cluster_name",
+    "resource_group_name",
+    "kubernetes_version",
+    "node_vm_size",
+    "node_count",
+    "api_server_public_access",
+    "tags"
+  ],
+  "location": {
+    "ui:widget": "select",
+    "ui:description": "Azure region the cluster would run in."
+  },
+  "cluster_name": {
+    "ui:placeholder": "demo-aks",
+    "ui:description": "3-40 lowercase letters, digits or hyphens, starting with a letter."
+  },
+  "resource_group_name": {
+    "ui:placeholder": "rg-demo-aks"
+  },
+  "kubernetes_version": {
+    "ui:widget": "select"
+  },
+  "node_vm_size": {
+    "ui:placeholder": "Standard_D2s_v5",
+    "ui:description": "VM size for the default node pool."
+  },
+  "node_count": {
+    "ui:description": "Number of nodes, 1-10."
+  },
+  "api_server_public_access": {
+    "ui:widget": "checkbox",
+    "ui:description": "**Exposes the Kubernetes API server to the internet.** Leave off unless you need it."
+  },
+  "tags": {
+    "ui:description": "Tags applied to every resource."
+  }
+}

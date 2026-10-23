@@ -1,0 +1,54 @@
+---
+# Mock server baseline. Runs on the workflow runner itself (localhost), so it
+# needs no inventory, SSH key or cloud connector. It only writes under /tmp.
+- name: Apply a server baseline (mock)
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    app_name: demo-app
+    environment_name: sandbox
+    packages:
+      - nginx
+      - chrony
+    baseline_dir: "/tmp/sg-sandbox/{{ app_name }}"
+
+  tasks:
+    - name: Show what this run would configure
+      ansible.builtin.debug:
+        msg: >-
+          Baseline for {{ app_name }} ({{ environment_name }}):
+          packages {{ packages | join(', ') }}, time sync, SSH hardening.
+
+    - name: Create the baseline directory
+      ansible.builtin.file:
+        path: "{{ baseline_dir }}"
+        state: directory
+        mode: "0755"
+
+    - name: Record the package list (stands in for installing packages)
+      ansible.builtin.copy:
+        dest: "{{ baseline_dir }}/packages.txt"
+        content: "{{ packages | join('\n') }}\n"
+        mode: "0644"
+
+    - name: Record the SSH hardening settings (stands in for sshd_config)
+      ansible.builtin.copy:
+        dest: "{{ baseline_dir }}/sshd_hardening.conf"
+        content: |
+          PermitRootLogin no
+          PasswordAuthentication no
+          X11Forwarding no
+        mode: "0644"
+
+    - name: Check the baseline is in place
+      ansible.builtin.stat:
+        path: "{{ baseline_dir }}/sshd_hardening.conf"
+      register: hardening
+
+    - name: Fail if the baseline is missing
+      ansible.builtin.assert:
+        that: hardening.stat.exists
+        success_msg: "Baseline applied for {{ app_name }}"
+        fail_msg: "Baseline file missing"

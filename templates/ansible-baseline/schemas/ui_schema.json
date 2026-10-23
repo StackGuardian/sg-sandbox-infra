@@ -1,0 +1,19 @@
+{
+  "ui:order": [
+    "app_name",
+    "environment_name",
+    "packages"
+  ],
+  "app_name": {
+    "ui:placeholder": "demo-app"
+  },
+  "environment_name": {
+    "ui:widget": "select"
+  },
+  "packages": {
+    "items": {
+      "ui:placeholder": "nginx"
+    },
+    "ui:description": "Packages the baseline records. The mock writes them to a file instead of installing them."
+  }
+}
