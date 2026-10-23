@@ -1,0 +1,22 @@
+{
+  "meta": {
+    "version": "v1",
+    "required_provider": "stackguardian/terraform_plan"
+  },
+  "evaluators": [
+    {
+      "id": "no_deletes",
+      "description": "Deleting or replacing a resource needs approval",
+      "provider_args": {
+        "operation_type": "action",
+        "terraform_resource_type": "*"
+      },
+      "condition": {
+        "type": "NotEquals",
+        "value": "delete",
+        "error_tolerance": 2
+      }
+    }
+  ],
+  "eval_expression": "no_deletes"
+}
