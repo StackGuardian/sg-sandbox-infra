@@ -1,0 +1,36 @@
+{
+  "ui:order": [
+    "region",
+    "cluster_name",
+    "kubernetes_version",
+    "node_instance_type",
+    "node_count",
+    "endpoint_public_access",
+    "tags"
+  ],
+  "region": {
+    "ui:widget": "select",
+    "ui:description": "AWS region the cluster would run in."
+  },
+  "cluster_name": {
+    "ui:placeholder": "demo-eks",
+    "ui:description": "3-40 lowercase letters, digits or hyphens, starting with a letter."
+  },
+  "kubernetes_version": {
+    "ui:widget": "select"
+  },
+  "node_instance_type": {
+    "ui:placeholder": "t3.medium",
+    "ui:description": "EC2 instance type for the managed node group."
+  },
+  "node_count": {
+    "ui:description": "Desired number of nodes, 1-10."
+  },
+  "endpoint_public_access": {
+    "ui:widget": "checkbox",
+    "ui:description": "**Exposes the Kubernetes API to the internet.** Leave off unless you need it."
+  },
+  "tags": {
+    "ui:description": "Tags applied to every resource."
+  }
+}

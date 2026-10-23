@@ -1,0 +1,33 @@
+{
+  "type": "object",
+  "properties": {
+    "app_name": {
+      "title": "Application name",
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$",
+      "default": "demo-app"
+    },
+    "environment_name": {
+      "title": "Environment",
+      "type": "string",
+      "enum": [
+        "sandbox",
+        "dev",
+        "staging",
+        "prod"
+      ],
+      "default": "sandbox"
+    },
+    "packages": {
+      "title": "Packages",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": [
+        "nginx",
+        "chrony"
+      ]
+    }
+  }
+}
