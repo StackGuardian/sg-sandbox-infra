@@ -1,0 +1,23 @@
+{
+  "ui:order": [
+    "region",
+    "bucket_prefix",
+    "versioning_enabled",
+    "noncurrent_version_expiration_days"
+  ],
+  "region": {
+    "ui:widget": "select",
+    "ui:description": "AWS region for the bucket."
+  },
+  "bucket_prefix": {
+    "ui:placeholder": "sg-sandbox",
+    "ui:description": "Start of the bucket name. A random suffix is added so the name is globally unique."
+  },
+  "versioning_enabled": {
+    "ui:widget": "checkbox",
+    "ui:description": "Keep previous versions of objects."
+  },
+  "noncurrent_version_expiration_days": {
+    "ui:description": "Days after which previous object versions are deleted."
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "type": "object",
+  "properties": {
+    "project_id": {
+      "title": "Project ID",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{4,28}[a-z0-9]$",
+      "minLength": 6
+    },
+    "region": {
+      "title": "Google Cloud region",
+      "type": "string",
+      "default": "us-central1"
+    },
+    "bucket_prefix": {
+      "title": "Bucket name prefix",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{1,38}[a-z0-9]$",
+      "default": "sgsandbox"
+    },
+    "noncurrent_version_retention_days": {
+      "title": "Delete old versions after (days)",
+      "type": "number",
+      "minimum": 1,
+      "default": 30
+    }
+  },
+  "required": [
+    "project_id"
+  ]
+}

@@ -1,0 +1,3 @@
+# Downloaded by helm --dependency-update.
+charts/
+Chart.lock

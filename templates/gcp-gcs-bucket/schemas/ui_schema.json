@@ -1,0 +1,23 @@
+{
+  "ui:order": [
+    "project_id",
+    "region",
+    "bucket_prefix",
+    "noncurrent_version_retention_days"
+  ],
+  "project_id": {
+    "ui:placeholder": "my-project-id",
+    "ui:description": "ID of the Google Cloud project to deploy into. Required: a cloud connector doesn't choose a project."
+  },
+  "region": {
+    "ui:placeholder": "us-central1",
+    "ui:description": "Region used as the bucket location."
+  },
+  "bucket_prefix": {
+    "ui:placeholder": "sgsandbox",
+    "ui:description": "A random suffix is added to keep the name globally unique."
+  },
+  "noncurrent_version_retention_days": {
+    "ui:description": "Days to keep a noncurrent object version before it is deleted."
+  }
+}

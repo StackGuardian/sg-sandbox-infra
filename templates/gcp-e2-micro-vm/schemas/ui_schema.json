@@ -1,0 +1,41 @@
+{
+  "ui:order": [
+    "project_id",
+    "region",
+    "zone",
+    "name_prefix",
+    "machine_type",
+    "external_ip_enabled",
+    "allowed_ssh_cidrs"
+  ],
+  "project_id": {
+    "ui:placeholder": "my-project-id",
+    "ui:description": "ID of the Google Cloud project to deploy into. Required: a cloud connector doesn't choose a project."
+  },
+  "region": {
+    "ui:placeholder": "us-central1",
+    "ui:description": "Region for the network."
+  },
+  "zone": {
+    "ui:placeholder": "us-central1-a",
+    "ui:description": "Zone for the VM. It must be in the region above."
+  },
+  "name_prefix": {
+    "ui:placeholder": "sgsandbox",
+    "ui:description": "A random suffix is added to keep names unique."
+  },
+  "machine_type": {
+    "ui:placeholder": "e2-micro",
+    "ui:description": "e2-micro is in the Google Cloud free tier in some US regions."
+  },
+  "external_ip_enabled": {
+    "ui:widget": "checkbox",
+    "ui:description": "Give the VM an ephemeral external IP."
+  },
+  "allowed_ssh_cidrs": {
+    "items": {
+      "ui:placeholder": "203.0.113.0/24"
+    },
+    "ui:description": "CIDR ranges allowed to reach the VM on port 22. Leave empty for no inbound traffic at all."
+  }
+}

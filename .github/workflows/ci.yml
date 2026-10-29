@@ -69,6 +69,9 @@ jobs:
           tofu init -backend=false -input=false
           tofu validate
       - name: plan with defaults, no warnings
+        # Real cloud templates need credentials to plan; CI only validates them.
+        # scripts/template-test.sh deploys and destroys them for real.
+        if: ${{ !(startsWith(matrix.dir, 'templates/aws-') || startsWith(matrix.dir, 'templates/azure-') || startsWith(matrix.dir, 'templates/gcp-')) }}
         working-directory: ${{ matrix.dir }}
         # Warnings on stderr fail drift runs on the platform, so they fail CI too.
         run: |

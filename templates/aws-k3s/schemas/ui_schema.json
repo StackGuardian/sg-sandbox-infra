@@ -1,0 +1,38 @@
+{
+  "ui:order": [
+    "region",
+    "name",
+    "use_default_vpc",
+    "vpc_cidr",
+    "instance_type",
+    "root_volume_size_gb",
+    "allowed_cidr"
+  ],
+  "region": {
+    "ui:widget": "select",
+    "ui:description": "AWS region for every resource."
+  },
+  "name": {
+    "ui:placeholder": "sandbox-k3s",
+    "ui:description": "Name prefix for every resource. A random suffix is added. Lowercase letters, digits and hyphens; must not start with \"sg-\"."
+  },
+  "use_default_vpc": {
+    "ui:widget": "checkbox",
+    "ui:description": "Deploy into the region's default VPC instead of creating a new one. AWS allows 5 VPCs per region by default. If the deploy fails with \"maximum number of VPCs\", turn this on or choose another region. The region must still have its default VPC."
+  },
+  "vpc_cidr": {
+    "ui:placeholder": "10.61.0.0/16",
+    "ui:description": "CIDR range of the new VPC (/24 or larger). The public subnet uses its first /24. Ignored when the default VPC is used."
+  },
+  "instance_type": {
+    "ui:placeholder": "t3.small",
+    "ui:description": "EC2 instance type. k3s needs about 2 GB of memory."
+  },
+  "root_volume_size_gb": {
+    "ui:description": "Size of the encrypted gp3 root volume."
+  },
+  "allowed_cidr": {
+    "ui:placeholder": "203.0.113.0/24",
+    "ui:description": "**Restrict this.** CIDR range allowed to reach SSH (22) and the Kubernetes API (6443). The default is open to the internet. The runner that applies the template must be inside it, because it reads the kubeconfig over SSH."
+  }
+}

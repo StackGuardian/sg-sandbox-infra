@@ -1,0 +1,12 @@
+# Wrapper chart: the kubernetes workflow step deploys a chart from the
+# repository, so this chart pulls in the public podinfo chart as a dependency.
+# Run helm with --dependency-update so the dependency is downloaded first.
+apiVersion: v2
+name: podinfo-sandbox
+description: The public podinfo demo app, sized for a small k3s node.
+type: application
+version: 0.1.0
+dependencies:
+  - name: podinfo
+    version: 6.15.0
+    repository: https://stefanprodan.github.io/podinfo

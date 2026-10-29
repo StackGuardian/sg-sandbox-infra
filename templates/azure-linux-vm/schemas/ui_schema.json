@@ -1,0 +1,35 @@
+{
+  "ui:order": [
+    "location",
+    "name_prefix",
+    "vm_size",
+    "os_disk_size_gb",
+    "public_ip_enabled",
+    "allowed_ssh_cidrs"
+  ],
+  "location": {
+    "ui:placeholder": "westeurope",
+    "ui:description": "Azure region for every resource."
+  },
+  "name_prefix": {
+    "ui:placeholder": "sgsandbox",
+    "ui:description": "3-20 lowercase letters, digits or hyphens. A random suffix is added to keep names unique."
+  },
+  "vm_size": {
+    "ui:placeholder": "Standard_B1s",
+    "ui:description": "Azure VM size."
+  },
+  "os_disk_size_gb": {
+    "ui:description": "Size of the OS disk."
+  },
+  "public_ip_enabled": {
+    "ui:widget": "checkbox",
+    "ui:description": "Give the VM a Standard SKU static public IP."
+  },
+  "allowed_ssh_cidrs": {
+    "items": {
+      "ui:placeholder": "203.0.113.0/24"
+    },
+    "ui:description": "CIDR ranges allowed to reach the VM on port 22. Leave empty for no inbound traffic at all."
+  }
+}
