@@ -1,0 +1,19 @@
+{
+  "ui:order": [
+    "location",
+    "name_prefix",
+    "container_name"
+  ],
+  "location": {
+    "ui:placeholder": "westeurope",
+    "ui:description": "Azure region for the resource group and the storage account."
+  },
+  "name_prefix": {
+    "ui:placeholder": "sgsandbox",
+    "ui:description": "3-16 lowercase letters or digits. A random suffix is added to keep names unique."
+  },
+  "container_name": {
+    "ui:placeholder": "data",
+    "ui:description": "Name of the private blob container."
+  }
+}

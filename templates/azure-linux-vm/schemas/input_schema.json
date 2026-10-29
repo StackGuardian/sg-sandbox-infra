@@ -1,0 +1,42 @@
+{
+  "type": "object",
+  "properties": {
+    "location": {
+      "title": "Azure region",
+      "type": "string",
+      "default": "westeurope"
+    },
+    "name_prefix": {
+      "title": "Name prefix",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{1,18}[a-z0-9]$",
+      "default": "sgsandbox"
+    },
+    "vm_size": {
+      "title": "VM size",
+      "type": "string",
+      "default": "Standard_B1s"
+    },
+    "os_disk_size_gb": {
+      "title": "OS disk size (GiB)",
+      "type": "number",
+      "minimum": 30,
+      "maximum": 256,
+      "default": 30
+    },
+    "public_ip_enabled": {
+      "title": "Public IP",
+      "type": "boolean",
+      "default": true
+    },
+    "allowed_ssh_cidrs": {
+      "title": "SSH allowed from",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^([0-9]{1,3}\\.){3}[0-9]{1,3}/([0-9]|[12][0-9]|3[0-2])$"
+      },
+      "default": []
+    }
+  }
+}

@@ -1,6 +1,6 @@
 # StackGuardian sandbox infrastructure
 
-This repository holds the infrastructure code behind your StackGuardian sandbox organization. It is mock code: every resource is a `terraform_data` or `null_resource`, plus one local file. Nothing is created in any cloud, and no cloud credentials or connectors are needed to plan or apply it.
+This repository holds the infrastructure code behind your StackGuardian sandbox organization. The workflows run mock code: every resource is a `terraform_data` or `null_resource`, plus one local file, so they need no cloud credentials or connectors. The cloud templates in the Library are real: attach your own cloud connector and they create small, low-cost resources in your account.
 
 The code is shaped like a real platform team's repository (regional networks around a shared network, a service, a stack that reads a secret, a small template catalog and two policies) so that the workflows, runs, templates and policies in your sandbox look and behave like real ones.
 
@@ -23,7 +23,7 @@ Your workflows sit in nested workflow groups under `project-sandbox`: a `dev` gr
 | `us-app` | `prod/us-east-2` | [`stacks/service`](stacks/service) | A run stopped by a policy |
 
 Also in your organization:
-- **Templates** `eks-cluster`, `aks-cluster`, `vm` and `ansible-baseline` in the Library, from [`templates/`](templates). `vm` and `eks-cluster` have two revisions each.
+- **Templates** in the Library, from [`templates/`](templates): real cloud templates for AWS, Azure and Google Cloud, plus the mock `vm` template with two revisions. See [Templates](#templates).
 - **Policies** `approve-destructive-changes` and `deny-public-ingress`, from [`policies/`](policies).
 - **Custom roles** `dev-engineer` and `prod-operator` under Access Management, scoped to the `dev` and `prod` groups. They are not assigned to anyone.
 - **Context tags** `env`, `region`, `team` and `cost-center` on every workflow.
@@ -53,19 +53,31 @@ Each switch is passed to a run as a `TF_VAR_*` environment variable, so the repo
 2. **Approve a change.** Open `eu-app`. Its latest run waits for approval of a database upgrade from 15 to 16. Approve it or reject it.
 3. **Follow an output.** Open the outputs of `core-network`, then the inputs of `eu-network` and `us-network`, which reference them.
 4. **Upgrade a template revision.** Open `dev-vm`, which uses revision 1 of `vm`, and move it to revision 2, which adds a data disk.
-5. **Deploy a template.** In the Library, open `eks-cluster` (or any other template), create a workflow from it, and fill in the form. The apply creates mock resources only. Turn on **Public API endpoint**, put the workflow in a group under `prod`, and `deny-public-ingress` stops the run.
+5. **Deploy a template.** Add a cloud connector, then open `aws-s3-bucket` (or another cloud template) in the Library, create a workflow from it with your connector, and keep the form defaults. The apply creates real resources in your account, so run a destroy when you are done.
 6. **Read the policies.** Open a policy to see its rule, its scope and its action. Each rule is a short JSON document in [`policies/`](policies).
 
 **Tip:** In this sandbox, a run fails when the plan or apply writes anything to its error output, warnings included. That happens, for example, when you pass a variable the stack doesn't declare, as a `TF_VAR_<name>` environment variable or as an input, or when a hook command fails. Stick to the variables each stack declares in its `variables.tf`.
 
 ## Templates
 
-| Template | Kind | Revisions | What it models |
-|---|---|---|---|
-| `eks-cluster` | OpenTofu | 1: [`templates/eks-cluster`](templates/eks-cluster); 2: [`templates/eks-cluster-v2`](templates/eks-cluster-v2), adds `node_count_max` for node autoscaling | An EKS cluster with its IAM role and a managed node group |
-| `aks-cluster` | OpenTofu | 1: [`templates/aks-cluster`](templates/aks-cluster) | An AKS cluster with its resource group and log analytics workspace |
-| `vm` | OpenTofu | 1: [`templates/vm`](templates/vm); 2: [`templates/vm-v2`](templates/vm-v2), adds `data_disk_size_gb` for a data disk | A VM with a security group and encrypted volumes |
-| `ansible-baseline` | Ansible | 1: [`templates/ansible-baseline`](templates/ansible-baseline) | A server baseline playbook that runs on the workflow runner itself |
+The cloud templates create real resources and need a cloud connector for their cloud. Every input has a working default, except the Google Cloud project ID. Sizes are kept small: a bucket or storage account costs close to nothing, and the VMs are the smallest general-purpose sizes. Destroy them when you are done.
+
+| Template | Cloud | What it creates |
+|---|---|---|
+| [`aws-s3-bucket`](templates/aws-s3-bucket) | AWS | A private, encrypted, versioned S3 bucket with a lifecycle rule |
+| [`aws-ec2-vm`](templates/aws-ec2-vm) | AWS | A t3.micro Amazon Linux 2023 instance in its own VPC, with no inbound access and Session Manager enabled |
+| [`aws-k3s`](templates/aws-k3s) | AWS | A single-node [k3s](https://k3s.io) Kubernetes cluster on a t3.small instance. Its kubeconfig is a sensitive output |
+| [`azure-storage-account`](templates/azure-storage-account) | Azure | A resource group, a StorageV2 account with blob versioning, and a private container |
+| [`azure-linux-vm`](templates/azure-linux-vm) | Azure | A Standard_B1s Ubuntu VM in its own resource group and virtual network, with no inbound access by default |
+| [`gcp-gcs-bucket`](templates/gcp-gcs-bucket) | Google Cloud | A private, versioned Cloud Storage bucket |
+| [`gcp-e2-micro-vm`](templates/gcp-e2-micro-vm) | Google Cloud | An e2-micro Debian VM in its own VPC, with no inbound access by default |
+| `vm` | none (mock) | Revision 1: [`templates/vm`](templates/vm); revision 2: [`templates/vm-v2`](templates/vm-v2), adds `data_disk_size_gb`. Used by `dev-vm` to show the upgrade path |
+
+[`templates/k3s-helm-release`](templates/k3s-helm-release) is a small Helm chart for the podinfo demo app. Deploy it to the `aws-k3s` cluster with a workflow that uses the Kubernetes step, and pass the cluster's `kubeconfig_b64` output as `KUBECONFIG_DATA` with an output reference. See its README.
+
+AWS allows 5 VPCs per region by default. If `aws-ec2-vm` or `aws-k3s` fails with "maximum number of VPCs", turn on **Use the default VPC** or choose another region.
+
+The `eks-cluster` and `aks-cluster` directories hold earlier mock templates that are no longer in the Library.
 
 Each revision has its own directory, so an older revision never changes when a new one is added. Each template has its input form in `schemas/input_schema.json` and `schemas/ui_schema.json`.
 
@@ -82,7 +94,7 @@ See [`policies/README.md`](policies/README.md) for how the rules read the plan, 
 
 Your sandbox has no cloud connector and no Git connector, on purpose: you are an admin of the organization, so you can add your own.
 
-- **Cloud:** add an [AWS](https://docs.stackguardian.io/docs/connectors/csp/aws/), [Azure](https://docs.stackguardian.io/docs/connectors/csp/azure/) or [GCP](https://docs.stackguardian.io/docs/connectors/csp/gcp/) connector, then deploy real infrastructure from your own code. The mock code in this repository never uses one.
+- **Cloud:** add an [AWS](https://docs.stackguardian.io/docs/connectors/csp/aws/), [Azure](https://docs.stackguardian.io/docs/connectors/csp/azure/) or [GCP](https://docs.stackguardian.io/docs/connectors/csp/gcp/) connector, then deploy the cloud templates, or real infrastructure from your own code. The mock workflows never use one.
 - **GitHub:** features that depend on a GitHub connector, such as runs triggered by pushes and pull requests, need the [StackGuardian GitHub App](https://docs.stackguardian.io/docs/connectors/vcs/githubcom/) installed for your own GitHub organization and connected to your sandbox. The sandbox does not demonstrate these features, and its pull requests do not trigger runs.
 
 ## Run it locally
