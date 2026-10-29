@@ -1,0 +1,49 @@
+# Mock of an EKS cluster: IAM role, control plane and one managed node group.
+# Revision 2 of the eks-cluster template: the node group autoscales up to
+# node_count_max.
+# Each terraform_data carries the attributes a real resource would have, so the
+# plan reads like a real one and policies can inspect input.*.
+
+resource "terraform_data" "cluster_role" {
+  input = {
+    kind           = "aws_iam_role"
+    name           = "${var.cluster_name}-cluster"
+    assumed_by     = "eks.amazonaws.com"
+    public_ingress = false
+    tags           = var.tags
+  }
+}
+
+resource "terraform_data" "cluster" {
+  input = {
+    kind               = "aws_eks_cluster"
+    name               = var.cluster_name
+    region             = var.region
+    kubernetes_version = var.kubernetes_version
+    role               = terraform_data.cluster_role.output.name
+    public_ingress     = var.endpoint_public_access
+    encrypted          = true
+    tags               = var.tags
+  }
+}
+
+resource "terraform_data" "node_group" {
+  input = {
+    kind           = "aws_eks_node_group"
+    name           = "${var.cluster_name}-default"
+    cluster        = terraform_data.cluster.output.name
+    instance_type  = var.node_instance_type
+    desired_size   = var.node_count
+    min_size       = var.node_count
+    max_size       = var.node_count_max
+    public_ingress = false
+    tags           = var.tags
+  }
+
+  lifecycle {
+    precondition {
+      condition     = var.node_count_max >= var.node_count
+      error_message = "node_count_max must be at least node_count."
+    }
+  }
+}
