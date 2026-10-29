@@ -9,7 +9,7 @@
       "description": "Resources must not accept traffic from the internet",
       "provider_args": {
         "operation_type": "attribute",
-        "terraform_resource_type": "*",
+        "terraform_resource_type": "terraform_data",
         "terraform_resource_attribute": "input.public_ingress"
       },
       "condition": {
