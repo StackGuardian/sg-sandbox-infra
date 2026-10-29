@@ -130,3 +130,21 @@ resource "azurerm_linux_virtual_machine" "this" {
   # The NSG must be on the subnet before the VM starts.
   depends_on = [azurerm_subnet_network_security_group_association.this]
 }
+
+# Stops (deallocates) the VM every day at auto_shutdown_time, so a forgotten VM
+# costs only its disk. Start it again from the portal or the CLI.
+resource "azurerm_dev_test_global_vm_shutdown_schedule" "this" {
+  count = var.auto_shutdown_enabled ? 1 : 0
+
+  virtual_machine_id    = azurerm_linux_virtual_machine.this.id
+  location              = azurerm_resource_group.this.location
+  enabled               = true
+  daily_recurrence_time = var.auto_shutdown_time
+  timezone              = "UTC"
+
+  notification_settings {
+    enabled = false
+  }
+
+  tags = local.tags
+}

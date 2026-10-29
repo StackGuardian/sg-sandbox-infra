@@ -17,3 +17,8 @@ output "ssm_connect_command" {
   description = "AWS CLI command that opens a shell on the instance through Session Manager."
   value       = "aws ssm start-session --target ${aws_instance.this.id} --region ${var.region}"
 }
+
+output "architecture" {
+  description = "CPU architecture of the instance (x86_64 or arm64)."
+  value       = local.architecture
+}

@@ -13,13 +13,9 @@ terraform {
       source  = "hashicorp/random"
       version = "~> 3.7"
     }
-    tls = {
-      source  = "hashicorp/tls"
-      version = "~> 4.1"
-    }
-    external = {
-      source  = "hashicorp/external"
-      version = "~> 2.3"
+    time = {
+      source  = "hashicorp/time"
+      version = "~> 0.13"
     }
   }
 }

@@ -72,10 +72,25 @@
       "default": 20
     },
     "allowed_cidr": {
-      "title": "SSH and Kubernetes API allowed from",
+      "title": "Kubernetes API allowed from",
       "type": "string",
       "pattern": "^([0-9]{1,3}\\.){3}[0-9]{1,3}/([0-9]|[12][0-9]|3[0-2])$",
       "default": "0.0.0.0/0"
+    },
+    "kubeconfig_wait_seconds": {
+      "title": "Wait for the kubeconfig",
+      "type": "number",
+      "enum": [
+        180,
+        300,
+        600
+      ],
+      "enumNames": [
+        "3 minutes",
+        "5 minutes",
+        "10 minutes"
+      ],
+      "default": 300
     }
   }
 }

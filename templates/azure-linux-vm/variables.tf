@@ -54,3 +54,20 @@ variable "allowed_ssh_cidrs" {
     error_message = "Every entry in allowed_ssh_cidrs must be a valid CIDR range."
   }
 }
+
+variable "auto_shutdown_enabled" {
+  description = "Stop the VM every day at auto_shutdown_time (UTC)."
+  type        = bool
+  default     = true
+}
+
+variable "auto_shutdown_time" {
+  description = "Daily shutdown time in UTC, as HHMM."
+  type        = string
+  default     = "1900"
+
+  validation {
+    condition     = can(regex("^([01][0-9]|2[0-3])[0-5][0-9]$", var.auto_shutdown_time))
+    error_message = "auto_shutdown_time must be HHMM in 24-hour time, e.g. 1900."
+  }
+}

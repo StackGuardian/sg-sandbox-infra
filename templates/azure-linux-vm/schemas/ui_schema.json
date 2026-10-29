@@ -5,7 +5,9 @@
     "vm_size",
     "os_disk_size_gb",
     "public_ip_enabled",
-    "allowed_ssh_cidrs"
+    "allowed_ssh_cidrs",
+    "auto_shutdown_enabled",
+    "auto_shutdown_time"
   ],
   "location": {
     "ui:widget": "select",
@@ -32,5 +34,13 @@
       "ui:placeholder": "203.0.113.0/24"
     },
     "ui:description": "CIDR ranges allowed to reach the VM on port 22. Leave empty for no inbound traffic at all."
+  },
+  "auto_shutdown_enabled": {
+    "ui:widget": "checkbox",
+    "ui:description": "Stop (deallocate) the VM every day at the time below, so a forgotten VM costs only its disk."
+  },
+  "auto_shutdown_time": {
+    "ui:widget": "select",
+    "ui:description": "Daily shutdown time, in UTC."
   }
 }

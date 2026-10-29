@@ -22,11 +22,10 @@ output "kubeconfig_b64" {
 
 output "kubeconfig_status" {
   description = "ok when the kubeconfig was read, otherwise why it is empty."
-  value       = data.external.kubeconfig.result.status
+  value       = local.kubeconfig_ready ? "ok" : "not published yet: k3s is still starting; run the workflow again in a few minutes"
 }
 
-output "ssh_private_key" {
-  description = "Private key for SSH as the ubuntu user, for debugging."
-  value       = tls_private_key.this.private_key_openssh
-  sensitive   = true
+output "ssm_connect_command" {
+  description = "Command to open a shell on the node with Session Manager."
+  value       = "aws ssm start-session --region ${var.region} --target ${aws_instance.this.id}"
 }

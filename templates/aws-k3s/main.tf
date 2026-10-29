@@ -121,26 +121,77 @@ locals {
   subnet_id = var.use_default_vpc ? data.aws_subnets.default[0].ids[0] : aws_subnet.public[0].id
 }
 
-# SSH key pair, generated here. The private key stays in the workflow's state.
+# The node writes its kubeconfig to an SSM SecureString parameter, and this
+# template reads it from there, so nothing connects to the node over SSH. The
+# instance role can write only that parameter, plus Session Manager for a shell.
 
-resource "tls_private_key" "this" {
-  algorithm = "ED25519"
+data "aws_iam_policy_document" "assume_ec2" {
+  statement {
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["ec2.amazonaws.com"]
+    }
+  }
 }
 
-resource "aws_key_pair" "this" {
-  key_name   = local.name
-  public_key = tls_private_key.this.public_key_openssh
+resource "aws_iam_role" "this" {
+  name               = local.name
+  assume_role_policy = data.aws_iam_policy_document.assume_ec2.json
 
   tags = {
     Name = local.name
   }
 }
 
-# Security group: SSH and the Kubernetes API from allowed_cidr.
+resource "aws_iam_role_policy_attachment" "ssm" {
+  role       = aws_iam_role.this.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+data "aws_iam_policy_document" "kubeconfig" {
+  statement {
+    actions   = ["ssm:PutParameter"]
+    resources = [aws_ssm_parameter.kubeconfig.arn]
+  }
+}
+
+resource "aws_iam_role_policy" "kubeconfig" {
+  name   = "write-kubeconfig"
+  role   = aws_iam_role.this.id
+  policy = data.aws_iam_policy_document.kubeconfig.json
+}
+
+resource "aws_iam_instance_profile" "this" {
+  role = aws_iam_role.this.name
+
+  tags = {
+    Name = local.name
+  }
+}
+
+# Created with a placeholder; the node overwrites it once k3s is up. Destroyed
+# with the rest of the template.
+resource "aws_ssm_parameter" "kubeconfig" {
+  name  = "/sg-sandbox/${local.name}/kubeconfig"
+  type  = "SecureString"
+  value = "pending"
+
+  tags = {
+    Name = local.name
+  }
+
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
+# Security group: the Kubernetes API from allowed_cidr. No SSH.
 
 resource "aws_security_group" "this" {
   name        = local.name
-  description = "k3s node: SSH and Kubernetes API from allowed_cidr."
+  description = "k3s node: Kubernetes API from allowed_cidr."
   vpc_id      = local.vpc_id
 
   tags = {
@@ -161,19 +212,6 @@ resource "aws_vpc_security_group_ingress_rule" "kube_api" {
   }
 }
 
-resource "aws_vpc_security_group_ingress_rule" "ssh" {
-  security_group_id = aws_security_group.this.id
-  description       = "SSH"
-  ip_protocol       = "tcp"
-  from_port         = 22
-  to_port           = 22
-  cidr_ipv4         = var.allowed_cidr
-
-  tags = {
-    Name = "${local.name}-ssh"
-  }
-}
-
 resource "aws_vpc_security_group_egress_rule" "all" {
   security_group_id = aws_security_group.this.id
   description       = "All outbound"
@@ -191,12 +229,15 @@ resource "aws_vpc_security_group_egress_rule" "all" {
 resource "aws_instance" "this" {
   ami                         = data.aws_ssm_parameter.ubuntu.insecure_value
   instance_type               = var.instance_type
-  key_name                    = aws_key_pair.this.key_name
+  iam_instance_profile        = aws_iam_instance_profile.this.name
   subnet_id                   = local.subnet_id
   vpc_security_group_ids      = [aws_security_group.this.id]
   associate_public_ip_address = true
 
-  user_data_base64 = base64encode(file("${path.module}/user_data.sh"))
+  user_data_base64 = base64encode(templatefile("${path.module}/user_data.sh", {
+    region         = var.region
+    kubeconfig_ssm = aws_ssm_parameter.kubeconfig.name
+  }))
 
   metadata_options {
     http_endpoint = "enabled"
@@ -223,49 +264,27 @@ resource "aws_instance" "this" {
     ignore_changes = [ami]
   }
 
-  # Wait until k3s has written its kubeconfig. OpenTofu's built-in SSH client
-  # does this, so no ssh binary is needed for this step.
-  provisioner "remote-exec" {
-    when = create
-
-    connection {
-      host        = self.public_ip
-      user        = "ubuntu"
-      private_key = tls_private_key.this.private_key_openssh
-      timeout     = "10m"
-    }
-
-    inline = [<<-EOT
-      until [ -f /etc/rancher/k3s/k3s.yaml ]; do
-        echo "The '/etc/rancher/k3s/k3s.yaml' is not available.. Retrying in 10 seconds.."
-        sleep 10
-      done
-      echo "The 'k3s.yaml' has been created. K3s is ready."
-      EOT
-    ]
-  }
-
-  depends_on = [aws_route_table_association.public]
+  depends_on = [aws_route_table_association.public, aws_iam_role_policy.kubeconfig]
 }
 
-# Read the kubeconfig over SSH. It runs at apply time after the node is ready,
-# then on every plan, so no file has to survive between runs. Needs `ssh` on
-# the runner. When the node can't be reached the outputs are empty instead of
-# failing, so a destroy always works.
-data "external" "kubeconfig" {
-  program = ["sh", "${path.module}/fetch-kubeconfig.sh"]
+# k3s takes a few minutes to install and publish its kubeconfig. Wait once,
+# after the node is created; later plans read the parameter directly.
+resource "time_sleep" "k3s" {
+  create_duration = "${var.kubeconfig_wait_seconds}s"
 
-  query = {
-    host    = aws_instance.this.public_ip
-    key_b64 = base64encode(tls_private_key.this.private_key_openssh)
+  triggers = {
+    instance_id = aws_instance.this.id
   }
 }
 
-# k3s writes 127.0.0.1, or 0.0.0.0 with --bind-address 0.0.0.0, as the server.
+data "aws_ssm_parameter" "kubeconfig" {
+  name            = aws_ssm_parameter.kubeconfig.name
+  with_decryption = true
+
+  depends_on = [time_sleep.k3s]
+}
+
 locals {
-  kubeconfig = (
-    data.external.kubeconfig.result.kubeconfig_b64 == ""
-    ? ""
-    : replace(base64decode(data.external.kubeconfig.result.kubeconfig_b64), "/https://(127\\.0\\.0\\.1|0\\.0\\.0\\.0):6443/", "https://${aws_instance.this.public_ip}:6443")
-  )
+  kubeconfig_ready = nonsensitive(data.aws_ssm_parameter.kubeconfig.value != "pending")
+  kubeconfig       = local.kubeconfig_ready ? data.aws_ssm_parameter.kubeconfig.value : ""
 }

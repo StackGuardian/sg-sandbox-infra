@@ -6,7 +6,8 @@
     "vpc_cidr",
     "instance_type",
     "root_volume_size_gb",
-    "allowed_cidr"
+    "allowed_cidr",
+    "kubeconfig_wait_seconds"
   ],
   "region": {
     "ui:widget": "select",
@@ -34,6 +35,10 @@
   },
   "allowed_cidr": {
     "ui:placeholder": "203.0.113.0/24",
-    "ui:description": "**Restrict this.** CIDR range allowed to reach SSH (22) and the Kubernetes API (6443). The default is open to the internet. The runner that applies the template must be inside it, because it reads the kubeconfig over SSH."
+    "ui:description": "**Restrict this.** CIDR range allowed to reach the Kubernetes API (6443). The default is open to the internet. Runs that use the kubeconfig, such as a Helm release, must come from inside it. SSH is closed; use Session Manager for a shell."
+  },
+  "kubeconfig_wait_seconds": {
+    "ui:widget": "select",
+    "ui:description": "How long the first apply waits for k3s to publish its kubeconfig. If the kubeconfig output is still empty, run the workflow again."
   }
 }

@@ -48,3 +48,9 @@ variable "allowed_ssh_cidrs" {
     error_message = "Every entry in allowed_ssh_cidrs must be a valid CIDR range."
   }
 }
+
+variable "spot" {
+  description = "Run as a Spot VM: much cheaper, but Google can stop it at any time. A stopped Spot VM keeps its disk."
+  type        = bool
+  default     = false
+}

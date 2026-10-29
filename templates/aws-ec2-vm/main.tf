@@ -15,9 +15,19 @@ data "aws_availability_zones" "available" {
   }
 }
 
-# Latest Amazon Linux 2023 AMI, from the public SSM parameter AWS maintains.
+# Graviton (t4g) sizes are arm64, the rest x86_64; the AMI follows the size.
+data "aws_ec2_instance_type" "this" {
+  instance_type = var.instance_type
+}
+
+locals {
+  architecture = contains(data.aws_ec2_instance_type.this.supported_architectures, "arm64") ? "arm64" : "x86_64"
+}
+
+# Latest Amazon Linux 2023 AMI for that architecture, from the public SSM
+# parameter AWS maintains.
 data "aws_ssm_parameter" "al2023" {
-  name = "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64"
+  name = "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-${local.architecture}"
 }
 
 # Network: by default its own VPC with one public subnet and no NAT gateway.

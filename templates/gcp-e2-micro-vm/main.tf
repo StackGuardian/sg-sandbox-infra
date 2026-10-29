@@ -74,6 +74,15 @@ resource "google_compute_instance" "this" {
     }
   }
 
+  # Spot VMs cost much less, but Google can stop them at any time.
+  scheduling {
+    provisioning_model          = var.spot ? "SPOT" : "STANDARD"
+    preemptible                 = var.spot
+    automatic_restart           = !var.spot
+    on_host_maintenance         = var.spot ? "TERMINATE" : "MIGRATE"
+    instance_termination_action = var.spot ? "STOP" : null
+  }
+
   shielded_instance_config {
     enable_secure_boot          = true
     enable_vtpm                 = true

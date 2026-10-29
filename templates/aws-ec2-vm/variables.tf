@@ -33,7 +33,7 @@ variable "use_default_vpc" {
 }
 
 variable "instance_type" {
-  description = "EC2 instance type."
+  description = "EC2 instance type. Graviton sizes (t4g) are arm64 and cost about 20% less; the AMI is picked to match."
   type        = string
   default     = "t3.micro"
 }

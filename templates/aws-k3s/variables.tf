@@ -50,12 +50,23 @@ variable "root_volume_size_gb" {
 }
 
 variable "allowed_cidr" {
-  description = "CIDR range allowed to reach SSH (22) and the Kubernetes API (6443). The default is open to the internet; restrict it to your own range. The runner that applies this template must be inside it, because it connects over SSH."
+  description = "CIDR range allowed to reach the Kubernetes API (6443). The default is open to the internet; restrict it to your own range. Runs that use the kubeconfig, such as a Helm release, must come from inside it."
   type        = string
   default     = "0.0.0.0/0"
 
   validation {
     condition     = can(cidrhost(var.allowed_cidr, 0))
     error_message = "allowed_cidr must be a valid CIDR range."
+  }
+}
+
+variable "kubeconfig_wait_seconds" {
+  description = "How long the first apply waits for k3s to publish its kubeconfig."
+  type        = number
+  default     = 300
+
+  validation {
+    condition     = var.kubeconfig_wait_seconds >= 60 && var.kubeconfig_wait_seconds <= 900
+    error_message = "kubeconfig_wait_seconds must be between 60 and 900."
   }
 }

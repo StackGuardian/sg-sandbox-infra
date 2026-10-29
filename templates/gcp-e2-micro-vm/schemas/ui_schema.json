@@ -6,7 +6,8 @@
     "name_prefix",
     "machine_type",
     "external_ip_enabled",
-    "allowed_ssh_cidrs"
+    "allowed_ssh_cidrs",
+    "spot"
   ],
   "project_id": {
     "ui:placeholder": "my-project-id",
@@ -37,5 +38,9 @@
       "ui:placeholder": "203.0.113.0/24"
     },
     "ui:description": "CIDR ranges allowed to reach the VM on port 22. Leave empty for no inbound traffic at all."
+  },
+  "spot": {
+    "ui:widget": "checkbox",
+    "ui:description": "Much cheaper, but Google can stop the VM at any time. A stopped Spot VM keeps its disk."
   }
 }

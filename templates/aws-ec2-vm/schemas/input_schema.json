@@ -51,12 +51,18 @@
       "enum": [
         "t3.nano",
         "t3.micro",
-        "t3.small"
+        "t3.small",
+        "t4g.nano",
+        "t4g.micro",
+        "t4g.small"
       ],
       "enumNames": [
         "t3.nano: 2 vCPU, 0.5 GiB",
         "t3.micro: 2 vCPU, 1 GiB",
-        "t3.small: 2 vCPU, 2 GiB"
+        "t3.small: 2 vCPU, 2 GiB",
+        "t4g.nano: 2 vCPU, 0.5 GiB, Graviton (arm64)",
+        "t4g.micro: 2 vCPU, 1 GiB, Graviton (arm64)",
+        "t4g.small: 2 vCPU, 2 GiB, Graviton (arm64)"
       ],
       "default": "t3.micro"
     },

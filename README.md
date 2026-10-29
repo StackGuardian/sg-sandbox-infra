@@ -73,6 +73,18 @@ The cloud templates create real resources and need a cloud connector for their c
 | [`gcp-e2-micro-vm`](templates/gcp-e2-micro-vm) | Google Cloud | An e2-micro Debian VM in its own VPC, with no inbound access by default |
 | `vm` | none (mock) | Revision 1: [`templates/vm`](templates/vm); revision 2: [`templates/vm-v2`](templates/vm-v2), adds `data_disk_size_gb`. Used by `dev-vm` to show the upgrade path |
 
+### Versions
+
+Each cloud template is versioned with Git tags named `<template>/v<n>`, for example `aws-k3s/v2`. Revision `n` of a template in the Library runs the code at that tag, so a revision never changes after it is published, while `main` moves on.
+
+- **v1** is the first release, with a text-field form. It is deprecated, so the Library points you to v2.
+- **v2** is the current release, with dropdowns for regions, sizes and other fixed choices.
+- **v3** is a draft (an unpublished revision) for four templates, with a change still being tried out:
+  - `aws-k3s`: the node publishes its kubeconfig to SSM Parameter Store, so nothing connects over SSH and port 22 stays closed;
+  - `aws-ec2-vm`: Graviton (`t4g`) sizes;
+  - `azure-linux-vm`: a daily auto-shutdown;
+  - `gcp-e2-micro-vm`: a Spot VM option.
+
 [`templates/k3s-helm-release`](templates/k3s-helm-release) is a small Helm chart for the podinfo demo app. Deploy it to the `aws-k3s` cluster with a workflow that uses the Kubernetes step, and pass the cluster's `kubeconfig_b64` output as `KUBECONFIG_DATA` with an output reference. See its README.
 
 AWS allows 5 VPCs per region by default. If `aws-ec2-vm` or `aws-k3s` fails with "maximum number of VPCs", turn on **Use the default VPC** or choose another region.
