@@ -261,10 +261,11 @@ data "external" "kubeconfig" {
   }
 }
 
+# k3s writes 127.0.0.1, or 0.0.0.0 with --bind-address 0.0.0.0, as the server.
 locals {
   kubeconfig = (
     data.external.kubeconfig.result.kubeconfig_b64 == ""
     ? ""
-    : replace(base64decode(data.external.kubeconfig.result.kubeconfig_b64), "127.0.0.1", aws_instance.this.public_ip)
+    : replace(base64decode(data.external.kubeconfig.result.kubeconfig_b64), "/https://(127\\.0\\.0\\.1|0\\.0\\.0\\.0):6443/", "https://${aws_instance.this.public_ip}:6443")
   )
 }
