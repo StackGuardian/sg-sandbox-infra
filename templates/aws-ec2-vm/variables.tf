@@ -26,6 +26,12 @@ variable "vpc_cidr" {
   }
 }
 
+variable "use_default_vpc" {
+  description = "Deploy into the account's default VPC instead of creating a new one. Use this when the region is at its VPC quota (5 by default) and the deploy fails with \"maximum number of VPCs\". The region must still have its default VPC."
+  type        = bool
+  default     = false
+}
+
 variable "instance_type" {
   description = "EC2 instance type."
   type        = string

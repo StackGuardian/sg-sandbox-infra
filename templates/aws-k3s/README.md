@@ -8,6 +8,8 @@ Needs an AWS cloud connector, and `ssh` on the runner that applies it. Every inp
 
 **Restrict `allowed_cidr`.** It opens SSH (22) and the Kubernetes API (6443) and defaults to `0.0.0.0/0`. The runner must stay inside the range, because it reads the kubeconfig over SSH.
 
+**VPC quota.** AWS allows 5 VPCs per region by default. If the deploy fails with "maximum number of VPCs", set `use_default_vpc` to `true` to use the region's default VPC instead, or choose another region.
+
 | Output | Description |
 |---|---|
 | `public_ip` | Public IP address of the node |
