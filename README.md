@@ -72,7 +72,7 @@ Each revision has its own directory, so an older revision never changes when a n
 | Policy | Rule | Action | Scope |
 |---|---|---|---|
 | `approve-destructive-changes` | No planned `delete` action on a `terraform_data` resource, which includes replacements | Approval required | Groups `prod/shared`, `prod/eu-central-1` and `prod/us-east-2` |
-| `deny-public-ingress` | `input.public_ingress` must be `false` on every resource that sets it | Fail | Every group under `prod` |
+| `deny-public-ingress` | `input.public_ingress` must be `false` on every `terraform_data` resource | Fail | Every group under `prod` |
 
 See [`policies/README.md`](policies/README.md) for how the rules read the plan, and how to run them locally with Tirith.
 
