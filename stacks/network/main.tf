@@ -12,8 +12,9 @@ locals {
 # Release guard: during a change freeze every plan fails before anything moves.
 resource "terraform_data" "change_guard" {
   input = {
-    stack       = "network"
-    environment = var.environment
+    stack          = "network"
+    environment    = var.environment
+    public_ingress = false
   }
 
   lifecycle {
@@ -42,12 +43,13 @@ resource "terraform_data" "shared_vpc_attachment" {
   count = var.shared_vpc_id == "" ? 0 : 1
 
   input = {
-    name          = "${local.name}-to-shared"
-    environment   = var.environment
-    region        = var.region
-    vpc           = module.network.vpc_name
-    vpc_cidr      = module.network.vpc_cidr
-    shared_vpc_id = var.shared_vpc_id
-    tags          = local.tags
+    name           = "${local.name}-to-shared"
+    environment    = var.environment
+    region         = var.region
+    vpc            = module.network.vpc_name
+    vpc_cidr       = module.network.vpc_cidr
+    shared_vpc_id  = var.shared_vpc_id
+    tags           = local.tags
+    public_ingress = false
   }
 }

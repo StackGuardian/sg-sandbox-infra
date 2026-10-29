@@ -12,11 +12,11 @@ Your workflows sit in nested workflow groups under `project-sandbox`: a `dev` gr
 
 | Workflow | Group | Comes from | What to look at |
 |---|---|---|---|
-| `dev-network` | `dev` | [`stacks/network`](stacks/network) | Environment variables, a pre-init hook ([`scripts/pre-plan-check.sh`](scripts/pre-plan-check.sh)) and a nightly plan schedule, which is disabled |
+| `dev-network` | `dev` | [`stacks/network`](stacks/network) | Environment variables, a pre-init hook that writes a line to the run log, and a nightly plan schedule, which is disabled |
 | `dev-app` | `dev` | [`stacks/service`](stacks/service) | A run stopped by a change freeze, then a destroy run |
 | `dev-vm` | `dev` | Template `vm`, revision 1 | A workflow created from a template. Revision 2 of the template is available, so you can see the upgrade path |
 | `core-network` | `prod/shared` | [`stacks/shared-network`](stacks/shared-network) | The shared VPC and the CIDR block reserved for each region, as outputs that the regional networks read. A drift check that found a difference, and a weekly drift check schedule, which is disabled |
-| `secrets-demo` | `prod/shared` | [`stacks/secrets-demo`](stacks/secrets-demo) | A token read from a vault secret. Only a short fingerprint of it appears in the outputs. A post-apply hook ([`scripts/post-apply-notify.sh`](scripts/post-apply-notify.sh)) |
+| `secrets-demo` | `prod/shared` | [`stacks/secrets-demo`](stacks/secrets-demo) | A token read from a vault secret. Only a short fingerprint of it appears in the outputs. A post-apply hook that writes a line to the run log |
 | `eu-network` | `prod/eu-central-1` | [`stacks/network`](stacks/network) | Inputs that reference the outputs of `core-network` |
 | `eu-app` | `prod/eu-central-1` | [`stacks/service`](stacks/service) | A database engine upgrade waiting for approval. You can approve or reject it |
 | `us-network` | `prod/us-east-2` | [`stacks/network`](stacks/network) | The same shared outputs, on OpenTofu 1.8.8 while every other workflow runs 1.11.14. When it completes, it starts `us-app` |
@@ -49,12 +49,14 @@ Each switch is passed to a run as a `TF_VAR_*` environment variable, so the repo
 
 ## Try it yourself
 
-1. **Re-run a workflow.** Open `dev-network`, start a plan, and compare it with the earlier runs. The pre-init hook prints its context at the top of the log.
+1. **Re-run a workflow.** Open `dev-network`, start a plan, and compare it with the earlier runs. The pre-init hook's line appears near the top of the log.
 2. **Approve a change.** Open `eu-app`. Its latest run waits for approval of a database upgrade from 15 to 16. Approve it or reject it.
 3. **Follow an output.** Open the outputs of `core-network`, then the inputs of `eu-network` and `us-network`, which reference them.
 4. **Upgrade a template revision.** Open `dev-vm`, which uses revision 1 of `vm`, and move it to revision 2, which adds a data disk.
 5. **Deploy a template.** In the Library, open `eks-cluster` (or any other template), create a workflow from it, and fill in the form. The apply creates mock resources only. Turn on **Public API endpoint**, put the workflow in a group under `prod`, and `deny-public-ingress` stops the run.
 6. **Read the policies.** Open a policy to see its rule, its scope and its action. Each rule is a short JSON document in [`policies/`](policies).
+
+**Tip:** In this sandbox, a run fails when the plan or apply writes anything to its error output, warnings included. That happens, for example, when you pass a variable the stack doesn't declare, as a `TF_VAR_<name>` environment variable or as an input, or when a hook command fails. Stick to the variables each stack declares in its `variables.tf`.
 
 ## Templates
 
@@ -72,7 +74,7 @@ Each revision has its own directory, so an older revision never changes when a n
 | Policy | Rule | Action | Scope |
 |---|---|---|---|
 | `approve-destructive-changes` | No planned `delete` action on a `terraform_data` resource, which includes replacements | Approval required | Groups `prod/shared`, `prod/eu-central-1` and `prod/us-east-2` |
-| `deny-public-ingress` | `input.public_ingress` must be `false` on every resource that sets it | Fail | Every group under `prod` |
+| `deny-public-ingress` | `input.public_ingress` must be `false` on every `terraform_data` resource | Fail | Every group under `prod` |
 
 See [`policies/README.md`](policies/README.md) for how the rules read the plan, and how to run them locally with Tirith.
 

@@ -19,6 +19,7 @@ resource "terraform_data" "vpc" {
     cidr_block           = var.vpc_cidr
     enable_dns_hostnames = true
     tags                 = var.tags
+    public_ingress       = false
   }
 
   triggers_replace = [var.vpc_cidr]
@@ -35,6 +36,7 @@ resource "terraform_data" "public_subnet" {
     cidr_block              = cidrsubnet(var.vpc_cidr, 4, each.value)
     map_public_ip_on_launch = true
     tier                    = "public"
+    public_ingress          = false
   }
 
   triggers_replace = [var.vpc_cidr]
@@ -51,6 +53,7 @@ resource "terraform_data" "private_subnet" {
     cidr_block              = cidrsubnet(var.vpc_cidr, 4, each.value + 8)
     map_public_ip_on_launch = false
     tier                    = "private"
+    public_ingress          = false
   }
 
   triggers_replace = [var.vpc_cidr]
@@ -60,9 +63,10 @@ resource "terraform_data" "nat_gateway" {
   count = var.nat_gateway_count
 
   input = {
-    name        = "${var.name}-nat-${var.availability_zones[count.index % length(var.availability_zones)]}"
-    environment = var.environment
-    subnet      = terraform_data.public_subnet[var.availability_zones[count.index % length(var.availability_zones)]].output.name
+    name           = "${var.name}-nat-${var.availability_zones[count.index % length(var.availability_zones)]}"
+    environment    = var.environment
+    subnet         = terraform_data.public_subnet[var.availability_zones[count.index % length(var.availability_zones)]].output.name
+    public_ingress = false
   }
 }
 
@@ -76,6 +80,7 @@ resource "terraform_data" "private_route_table" {
     default_route = var.nat_gateway_count > 0 ? (
       terraform_data.nat_gateway[each.value % var.nat_gateway_count].output.name
     ) : "none"
+    public_ingress = false
   }
 }
 
@@ -97,5 +102,6 @@ resource "terraform_data" "flow_logs" {
     traffic_type   = "ALL"
     retention_days = var.flow_logs_retention_days
     encrypted      = true
+    public_ingress = false
   }
 }

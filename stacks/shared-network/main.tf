@@ -27,8 +27,9 @@ locals {
 # Release guard: during a change freeze every plan fails before anything moves.
 resource "terraform_data" "change_guard" {
   input = {
-    stack       = "shared-network"
-    environment = var.environment
+    stack          = "shared-network"
+    environment    = var.environment
+    public_ingress = false
   }
 
   lifecycle {
@@ -63,6 +64,7 @@ resource "terraform_data" "transit_gateway" {
     amazon_side_asn     = 64512
     default_route_table = "disabled"
     tags                = local.tags
+    public_ingress      = false
   }
 }
 
@@ -72,6 +74,7 @@ resource "terraform_data" "shared_vpc_attachment" {
     environment        = var.environment
     vpc_id             = terraform_data.shared_vpc.output.vpc_id
     transit_gateway_id = terraform_data.transit_gateway.output.transit_gateway_id
+    public_ingress     = false
   }
 }
 
@@ -85,6 +88,7 @@ resource "terraform_data" "regional_allocation" {
     region             = each.key
     cidr_block         = each.value
     transit_gateway_id = terraform_data.transit_gateway.output.transit_gateway_id
+    public_ingress     = false
   }
 
   triggers_replace = [each.value]
