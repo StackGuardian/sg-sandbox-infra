@@ -177,20 +177,38 @@ verify_gcp-e2-micro-vm() {
 
 # ---- leftovers --------------------------------------------------------------
 
+# ec2_exists <arn>: true while the resource is still there (unknown types count as there).
+ec2_exists() {
+  local kind="${1##*:}" id="${1##*/}" q
+  kind="${kind%%/*}"
+  case "$kind" in
+    instance)
+      q="$(aws ec2 describe-instances --instance-ids "$id" --query 'Reservations[0].Instances[0].State.Name' --output text 2>/dev/null)"
+      [ -n "$q" ] && [ "$q" != terminated ] && [ "$q" != None ] ;;
+    volume) aws ec2 describe-volumes --volume-ids "$id" >/dev/null 2>&1 ;;
+    vpc) aws ec2 describe-vpcs --vpc-ids "$id" >/dev/null 2>&1 ;;
+    subnet) aws ec2 describe-subnets --subnet-ids "$id" >/dev/null 2>&1 ;;
+    internet-gateway) aws ec2 describe-internet-gateways --internet-gateway-ids "$id" >/dev/null 2>&1 ;;
+    route-table) aws ec2 describe-route-tables --route-table-ids "$id" >/dev/null 2>&1 ;;
+    security-group) aws ec2 describe-security-groups --group-ids "$id" >/dev/null 2>&1 ;;
+    security-group-rule) aws ec2 describe-security-group-rules --security-group-rule-ids "$id" >/dev/null 2>&1 ;;
+    key-pair) aws ec2 describe-key-pairs --key-pair-ids "$id" >/dev/null 2>&1 ;;
+    network-interface) aws ec2 describe-network-interfaces --network-interface-ids "$id" >/dev/null 2>&1 ;;
+    *) return 0 ;;
+  esac
+}
+
 leftovers_aws() {
-  local arns live a st
+  local arns live a
   for _ in 1 2 3 4 5 6; do
     arns="$(aws resourcegroupstaggingapi get-resources \
       --tag-filters "Key=sandbox-template,Values=$tpl" --query 'ResourceTagMappingList[].ResourceARN' --output text)"
     live=""
     for a in $arns; do
+      # The tagging API (and describe-tags) keep deleted resources listed for
+      # a while, so EC2 resources are looked up directly.
       case "$a" in
-        arn:aws:ec2:*:instance/*)
-          # Terminated instances keep their tags for a while.
-          st="$(aws ec2 describe-instances --instance-ids "${a##*/}" \
-            --query 'Reservations[0].Instances[0].State.Name' --output text 2>/dev/null)"
-          [ "$st" = terminated ] && continue
-          ;;
+        arn:aws:ec2:*) ec2_exists "$a" || continue ;;
       esac
       live="$live $a"
     done
