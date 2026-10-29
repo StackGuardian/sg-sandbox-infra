@@ -39,3 +39,9 @@ variable "change_freeze" {
   type        = bool
   default     = false
 }
+
+variable "shared_vpc_id" {
+  description = "ID of the shared services VPC to attach to, usually the vpc_id output of the shared-network workflow. Empty means a standalone network."
+  type        = string
+  default     = ""
+}

@@ -22,3 +22,13 @@ output "nat_gateways" {
   description = "NAT gateway names."
   value       = module.network.nat_gateways
 }
+
+output "region" {
+  description = "Region the network is planned for."
+  value       = var.region
+}
+
+output "shared_vpc_id" {
+  description = "Shared services VPC this network is attached to, or empty when standalone."
+  value       = var.shared_vpc_id
+}
