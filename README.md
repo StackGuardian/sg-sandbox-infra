@@ -56,6 +56,8 @@ Each switch is passed to a run as a `TF_VAR_*` environment variable, so the repo
 5. **Deploy a template.** In the Library, open `eks-cluster` (or any other template), create a workflow from it, and fill in the form. The apply creates mock resources only. Turn on **Public API endpoint**, put the workflow in a group under `prod`, and `deny-public-ingress` stops the run.
 6. **Read the policies.** Open a policy to see its rule, its scope and its action. Each rule is a short JSON document in [`policies/`](policies).
 
+**Tip:** In this sandbox, a run fails when the plan or apply writes anything to its error output, warnings included. That happens, for example, when you pass a variable the stack doesn't declare, as a `TF_VAR_<name>` environment variable or as an input, or when a hook command fails. Stick to the variables each stack declares in its `variables.tf`.
+
 ## Templates
 
 | Template | Kind | Revisions | What it models |
