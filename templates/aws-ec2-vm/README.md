@@ -6,6 +6,8 @@ The security group allows no inbound traffic by default. Add CIDR ranges to `all
 
 Needs an AWS cloud connector. Every input has a working default.
 
+**VPC quota.** AWS allows 5 VPCs per region by default. If the deploy fails with "maximum number of VPCs", set `use_default_vpc` to `true` to use the region's default VPC instead, or choose another region.
+
 | Output | Description |
 |---|---|
 | `instance_id` | ID of the instance |

@@ -10,7 +10,7 @@ output "public_ip" {
 
 output "vpc_id" {
   description = "ID of the VPC the instance runs in."
-  value       = aws_vpc.this.id
+  value       = local.vpc_id
 }
 
 output "ssm_connect_command" {

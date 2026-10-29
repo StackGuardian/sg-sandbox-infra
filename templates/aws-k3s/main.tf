@@ -20,9 +20,49 @@ data "aws_ssm_parameter" "ubuntu" {
   name = "/aws/service/canonical/ubuntu/server/22.04/stable/current/amd64/hvm/ebs-gp2/ami-id"
 }
 
-# Network: one public subnet, no NAT gateway.
+# Network: by default its own VPC with one public subnet and no NAT gateway.
+# With use_default_vpc the account's default VPC is used instead, which avoids
+# the per-region VPC quota (5 by default).
+
+# aws_vpcs (not aws_vpc) so a region without a default VPC gets a clear error.
+data "aws_vpcs" "default" {
+  count = var.use_default_vpc ? 1 : 0
+
+  filter {
+    name   = "is-default"
+    values = ["true"]
+  }
+}
+
+data "aws_subnets" "default" {
+  count = var.use_default_vpc ? 1 : 0
+
+  filter {
+    name   = "vpc-id"
+    values = data.aws_vpcs.default[0].ids
+  }
+
+  filter {
+    name   = "default-for-az"
+    values = ["true"]
+  }
+
+  filter {
+    name   = "availability-zone"
+    values = [data.aws_availability_zones.available.names[0]]
+  }
+
+  lifecycle {
+    precondition {
+      condition     = length(data.aws_vpcs.default[0].ids) == 1
+      error_message = "use_default_vpc is true, but ${var.region} has no default VPC. Set use_default_vpc to false or choose a region that has one."
+    }
+  }
+}
 
 resource "aws_vpc" "this" {
+  count = var.use_default_vpc ? 0 : 1
+
   cidr_block           = var.vpc_cidr
   enable_dns_support   = true
   enable_dns_hostnames = true
@@ -33,7 +73,9 @@ resource "aws_vpc" "this" {
 }
 
 resource "aws_internet_gateway" "this" {
-  vpc_id = aws_vpc.this.id
+  count = var.use_default_vpc ? 0 : 1
+
+  vpc_id = aws_vpc.this[0].id
 
   tags = {
     Name = local.name
@@ -41,7 +83,9 @@ resource "aws_internet_gateway" "this" {
 }
 
 resource "aws_subnet" "public" {
-  vpc_id            = aws_vpc.this.id
+  count = var.use_default_vpc ? 0 : 1
+
+  vpc_id            = aws_vpc.this[0].id
   cidr_block        = cidrsubnet(var.vpc_cidr, 24 - tonumber(split("/", var.vpc_cidr)[1]), 0)
   availability_zone = data.aws_availability_zones.available.names[0]
 
@@ -51,11 +95,13 @@ resource "aws_subnet" "public" {
 }
 
 resource "aws_route_table" "public" {
-  vpc_id = aws_vpc.this.id
+  count = var.use_default_vpc ? 0 : 1
+
+  vpc_id = aws_vpc.this[0].id
 
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.this.id
+    gateway_id = aws_internet_gateway.this[0].id
   }
 
   tags = {
@@ -64,8 +110,15 @@ resource "aws_route_table" "public" {
 }
 
 resource "aws_route_table_association" "public" {
-  subnet_id      = aws_subnet.public.id
-  route_table_id = aws_route_table.public.id
+  count = var.use_default_vpc ? 0 : 1
+
+  subnet_id      = aws_subnet.public[0].id
+  route_table_id = aws_route_table.public[0].id
+}
+
+locals {
+  vpc_id    = var.use_default_vpc ? data.aws_vpcs.default[0].ids[0] : aws_vpc.this[0].id
+  subnet_id = var.use_default_vpc ? data.aws_subnets.default[0].ids[0] : aws_subnet.public[0].id
 }
 
 # SSH key pair, generated here. The private key stays in the workflow's state.
@@ -88,7 +141,7 @@ resource "aws_key_pair" "this" {
 resource "aws_security_group" "this" {
   name        = local.name
   description = "k3s node: SSH and Kubernetes API from allowed_cidr."
-  vpc_id      = aws_vpc.this.id
+  vpc_id      = local.vpc_id
 
   tags = {
     Name = local.name
@@ -139,7 +192,7 @@ resource "aws_instance" "this" {
   ami                         = data.aws_ssm_parameter.ubuntu.insecure_value
   instance_type               = var.instance_type
   key_name                    = aws_key_pair.this.key_name
-  subnet_id                   = aws_subnet.public.id
+  subnet_id                   = local.subnet_id
   vpc_security_group_ids      = [aws_security_group.this.id]
   associate_public_ip_address = true
 
