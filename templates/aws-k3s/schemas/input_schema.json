@@ -7,34 +7,24 @@
       "enum": [
         "us-east-1",
         "us-east-2",
-        "us-west-1",
         "us-west-2",
-        "af-south-1",
-        "ap-east-1",
-        "ap-south-1",
-        "ap-south-2",
-        "ap-southeast-1",
-        "ap-southeast-2",
-        "ap-southeast-3",
-        "ap-southeast-4",
-        "ap-southeast-5",
-        "ap-northeast-1",
-        "ap-northeast-2",
-        "ap-northeast-3",
-        "ca-central-1",
-        "ca-west-1",
         "eu-central-1",
-        "eu-central-2",
         "eu-west-1",
         "eu-west-2",
-        "eu-west-3",
-        "eu-south-1",
-        "eu-south-2",
-        "eu-north-1",
-        "il-central-1",
-        "me-south-1",
-        "me-central-1",
-        "sa-east-1"
+        "ap-south-1",
+        "ap-southeast-1",
+        "ap-northeast-1"
+      ],
+      "enumNames": [
+        "US East (N. Virginia)",
+        "US East (Ohio)",
+        "US West (Oregon)",
+        "Europe (Frankfurt)",
+        "Europe (Ireland)",
+        "Europe (London)",
+        "Asia Pacific (Mumbai)",
+        "Asia Pacific (Singapore)",
+        "Asia Pacific (Tokyo)"
       ],
       "default": "eu-central-1"
     },
@@ -58,13 +48,27 @@
     "instance_type": {
       "title": "Instance type",
       "type": "string",
+      "enum": [
+        "t3.small",
+        "t3.medium"
+      ],
+      "enumNames": [
+        "t3.small: 2 vCPU, 2 GiB",
+        "t3.medium: 2 vCPU, 4 GiB"
+      ],
       "default": "t3.small"
     },
     "root_volume_size_gb": {
-      "title": "Root volume size (GiB)",
+      "title": "Root volume size",
       "type": "number",
-      "minimum": 10,
-      "maximum": 100,
+      "enum": [
+        20,
+        40
+      ],
+      "enumNames": [
+        "20 GiB",
+        "40 GiB"
+      ],
       "default": 20
     },
     "allowed_cidr": {

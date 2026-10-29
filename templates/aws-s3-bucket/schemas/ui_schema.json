@@ -18,6 +18,7 @@
     "ui:description": "Keep previous versions of objects."
   },
   "noncurrent_version_expiration_days": {
+    "ui:widget": "select",
     "ui:description": "Days after which previous object versions are deleted."
   }
 }

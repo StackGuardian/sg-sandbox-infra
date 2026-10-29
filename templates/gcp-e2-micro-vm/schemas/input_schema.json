@@ -10,12 +10,31 @@
     "region": {
       "title": "Google Cloud region",
       "type": "string",
+      "enum": [
+        "us-central1",
+        "us-east1",
+        "us-west1",
+        "europe-west1",
+        "europe-west3",
+        "asia-southeast1",
+        "asia-northeast1"
+      ],
+      "enumNames": [
+        "US: Iowa (us-central1), e2-micro free tier",
+        "US: South Carolina (us-east1), e2-micro free tier",
+        "US: Oregon (us-west1), e2-micro free tier",
+        "Europe: Belgium (europe-west1)",
+        "Europe: Frankfurt (europe-west3)",
+        "Asia: Singapore (asia-southeast1)",
+        "Asia: Tokyo (asia-northeast1)"
+      ],
       "default": "us-central1"
     },
     "zone": {
-      "title": "Zone",
+      "title": "Zone (optional)",
       "type": "string",
-      "default": "us-central1-a"
+      "pattern": "^$|^[a-z]+-[a-z]+[0-9]-[a-z]$",
+      "default": ""
     },
     "name_prefix": {
       "title": "Name prefix",
@@ -26,6 +45,16 @@
     "machine_type": {
       "title": "Machine type",
       "type": "string",
+      "enum": [
+        "e2-micro",
+        "e2-small",
+        "e2-medium"
+      ],
+      "enumNames": [
+        "e2-micro: 2 shared vCPU, 1 GB",
+        "e2-small: 2 shared vCPU, 2 GB",
+        "e2-medium: 2 shared vCPU, 4 GB"
+      ],
       "default": "e2-micro"
     },
     "external_ip_enabled": {

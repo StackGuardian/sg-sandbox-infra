@@ -10,9 +10,9 @@ variable "region" {
 }
 
 variable "zone" {
-  description = "Zone for the VM. It must be in the region."
+  description = "Zone for the VM. It must be in the region. Leave empty to use the region's first available zone (not every region has an \"-a\" zone)."
   type        = string
-  default     = "us-central1-a"
+  default     = ""
 }
 
 variable "name_prefix" {

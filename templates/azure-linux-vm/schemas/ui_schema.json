@@ -8,7 +8,7 @@
     "allowed_ssh_cidrs"
   ],
   "location": {
-    "ui:placeholder": "westeurope",
+    "ui:widget": "select",
     "ui:description": "Azure region for every resource."
   },
   "name_prefix": {
@@ -16,10 +16,11 @@
     "ui:description": "3-20 lowercase letters, digits or hyphens. A random suffix is added to keep names unique."
   },
   "vm_size": {
-    "ui:placeholder": "Standard_B1s",
-    "ui:description": "Azure VM size."
+    "ui:widget": "select",
+    "ui:description": "Azure VM size. All three are burstable B-series sizes."
   },
   "os_disk_size_gb": {
+    "ui:widget": "select",
     "ui:description": "Size of the OS disk."
   },
   "public_ip_enabled": {

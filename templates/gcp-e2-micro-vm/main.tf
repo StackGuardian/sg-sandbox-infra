@@ -7,6 +7,12 @@ locals {
     sandbox-template = "gcp-e2-micro-vm"
   }
   name = "${var.name_prefix}-${random_string.suffix.result}"
+  zone = var.zone != "" ? var.zone : sort(data.google_compute_zones.available.names)[0]
+}
+
+data "google_compute_zones" "available" {
+  region = var.region
+  status = "UP"
 }
 
 resource "random_string" "suffix" {
@@ -46,7 +52,7 @@ resource "google_compute_firewall" "ssh" {
 
 resource "google_compute_instance" "this" {
   name         = "vm-${local.name}"
-  zone         = var.zone
+  zone         = local.zone
   machine_type = var.machine_type
   tags         = ["ssh"]
 

@@ -5,7 +5,7 @@
     "container_name"
   ],
   "location": {
-    "ui:placeholder": "westeurope",
+    "ui:widget": "select",
     "ui:description": "Azure region for the resource group and the storage account."
   },
   "name_prefix": {

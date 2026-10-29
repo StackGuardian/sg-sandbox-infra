@@ -13,20 +13,20 @@
     "ui:description": "ID of the Google Cloud project to deploy into. Required: a cloud connector doesn't choose a project."
   },
   "region": {
-    "ui:placeholder": "us-central1",
-    "ui:description": "Region for the network."
+    "ui:widget": "select",
+    "ui:description": "Region for the network and the VM. The e2-micro free tier applies in the three US regions."
   },
   "zone": {
-    "ui:placeholder": "us-central1-a",
-    "ui:description": "Zone for the VM. It must be in the region above."
+    "ui:placeholder": "us-central1-b",
+    "ui:description": "Zone for the VM, in the region above. Leave empty to use the region's first available zone."
   },
   "name_prefix": {
     "ui:placeholder": "sgsandbox",
     "ui:description": "A random suffix is added to keep names unique."
   },
   "machine_type": {
-    "ui:placeholder": "e2-micro",
-    "ui:description": "e2-micro is in the Google Cloud free tier in some US regions."
+    "ui:widget": "select",
+    "ui:description": "Machine type. e2-micro is in the Google Cloud free tier in the three US regions."
   },
   "external_ip_enabled": {
     "ui:widget": "checkbox",

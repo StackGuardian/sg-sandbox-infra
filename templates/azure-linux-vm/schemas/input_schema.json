@@ -4,6 +4,24 @@
     "location": {
       "title": "Azure region",
       "type": "string",
+      "enum": [
+        "eastus",
+        "westus2",
+        "westeurope",
+        "northeurope",
+        "germanywestcentral",
+        "southeastasia",
+        "japaneast"
+      ],
+      "enumNames": [
+        "US: East US",
+        "US: West US 2",
+        "Europe: West Europe (Netherlands)",
+        "Europe: North Europe (Ireland)",
+        "Europe: Germany West Central",
+        "Asia: Southeast Asia (Singapore)",
+        "Asia: Japan East"
+      ],
       "default": "westeurope"
     },
     "name_prefix": {
@@ -15,13 +33,31 @@
     "vm_size": {
       "title": "VM size",
       "type": "string",
+      "enum": [
+        "Standard_B1s",
+        "Standard_B1ms",
+        "Standard_B2s"
+      ],
+      "enumNames": [
+        "B1s: 1 vCPU, 1 GiB",
+        "B1ms: 1 vCPU, 2 GiB",
+        "B2s: 2 vCPU, 4 GiB"
+      ],
       "default": "Standard_B1s"
     },
     "os_disk_size_gb": {
-      "title": "OS disk size (GiB)",
+      "title": "OS disk size",
       "type": "number",
-      "minimum": 30,
-      "maximum": 256,
+      "enum": [
+        30,
+        64,
+        128
+      ],
+      "enumNames": [
+        "30 GiB",
+        "64 GiB",
+        "128 GiB"
+      ],
       "default": 30
     },
     "public_ip_enabled": {

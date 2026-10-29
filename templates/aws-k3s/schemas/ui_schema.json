@@ -25,10 +25,11 @@
     "ui:description": "CIDR range of the new VPC (/24 or larger). The public subnet uses its first /24. Ignored when the default VPC is used."
   },
   "instance_type": {
-    "ui:placeholder": "t3.small",
-    "ui:description": "EC2 instance type. k3s needs about 2 GB of memory."
+    "ui:widget": "select",
+    "ui:description": "EC2 instance type. k3s needs about 2 GiB of memory; pick t3.medium for more workloads."
   },
   "root_volume_size_gb": {
+    "ui:widget": "select",
     "ui:description": "Size of the encrypted gp3 root volume."
   },
   "allowed_cidr": {

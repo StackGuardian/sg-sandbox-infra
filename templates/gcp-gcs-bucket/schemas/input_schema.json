@@ -10,6 +10,24 @@
     "region": {
       "title": "Google Cloud region",
       "type": "string",
+      "enum": [
+        "us-central1",
+        "us-east1",
+        "us-west1",
+        "europe-west1",
+        "europe-west3",
+        "asia-southeast1",
+        "asia-northeast1"
+      ],
+      "enumNames": [
+        "US: Iowa (us-central1), e2-micro free tier",
+        "US: South Carolina (us-east1), e2-micro free tier",
+        "US: Oregon (us-west1), e2-micro free tier",
+        "Europe: Belgium (europe-west1)",
+        "Europe: Frankfurt (europe-west3)",
+        "Asia: Singapore (asia-southeast1)",
+        "Asia: Tokyo (asia-northeast1)"
+      ],
       "default": "us-central1"
     },
     "bucket_prefix": {
@@ -19,9 +37,20 @@
       "default": "sgsandbox"
     },
     "noncurrent_version_retention_days": {
-      "title": "Delete old versions after (days)",
+      "title": "Delete old versions after",
       "type": "number",
-      "minimum": 1,
+      "enum": [
+        7,
+        30,
+        90,
+        365
+      ],
+      "enumNames": [
+        "7 days",
+        "30 days",
+        "90 days",
+        "365 days"
+      ],
       "default": 30
     }
   },
