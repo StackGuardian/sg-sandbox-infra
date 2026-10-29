@@ -1,0 +1,37 @@
+{
+  "ui:order": [
+    "region",
+    "name",
+    "instance_type",
+    "disk_size_gb",
+    "data_disk_size_gb",
+    "allowed_cidrs",
+    "tags"
+  ],
+  "region": {
+    "ui:widget": "select",
+    "ui:description": "AWS region the VM would run in."
+  },
+  "name": {
+    "ui:placeholder": "demo-vm",
+    "ui:description": "3-40 lowercase letters, digits or hyphens, starting with a letter."
+  },
+  "instance_type": {
+    "ui:placeholder": "t3.small"
+  },
+  "disk_size_gb": {
+    "ui:description": "8-500 GiB."
+  },
+  "data_disk_size_gb": {
+    "ui:description": "0 for no data disk, otherwise 10-2000 GiB. New in revision 2."
+  },
+  "allowed_cidrs": {
+    "items": {
+      "ui:placeholder": "10.0.0.0/8"
+    },
+    "ui:description": "Ranges allowed to reach the VM on port 443. **Adding 0.0.0.0/0 makes the VM public.**"
+  },
+  "tags": {
+    "ui:description": "Tags applied to every resource."
+  }
+}
