@@ -1,0 +1,13 @@
+# Values for the podinfo dependency go under the "podinfo" key.
+podinfo:
+  replicaCount: 1
+
+  service:
+    type: ClusterIP
+
+  resources:
+    requests:
+      cpu: 10m
+      memory: 32Mi
+    limits:
+      memory: 128Mi
