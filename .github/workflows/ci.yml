@@ -13,7 +13,8 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  TOFU_VERSION: 1.8.8
+  # Workflows run 1.11.14; one runs 1.8.8. Both are checked below.
+  TOFU_VERSION: 1.11.14
 
 jobs:
   fmt:
@@ -44,7 +45,7 @@ jobs:
           echo "$dirs"
 
   validate:
-    name: validate ${{ matrix.dir }}
+    name: validate ${{ matrix.dir }} (tofu ${{ matrix.tofu }})
     needs: roots
     if: needs.roots.outputs.dirs != '[]'
     runs-on: ubuntu-24.04
@@ -52,11 +53,15 @@ jobs:
       fail-fast: false
       matrix:
         dir: ${{ fromJSON(needs.roots.outputs.dirs) }}
+        tofu: ["1.11.14", "1.8.8"]
+    env:
+      # stacks/secrets-demo requires a token; this placeholder is not a secret.
+      TF_VAR_api_token: ci-placeholder-token
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - uses: opentofu/setup-opentofu@000eeb8522f0572907c393e8151076c205fdba1b # v1.0.6
         with:
-          tofu_version: ${{ env.TOFU_VERSION }}
+          tofu_version: ${{ matrix.tofu }}
           tofu_wrapper: false
       - name: init and validate
         working-directory: ${{ matrix.dir }}
