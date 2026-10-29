@@ -131,21 +131,17 @@ verify_aws-k3s() {
 
   # Second-step path: install the helm release template with this kubeconfig.
   local rel="$repo/templates/k3s-helm-release"
-  if [ -f "$rel/values.yaml" ]; then
+  if [ -f "$rel/Chart.yaml" ]; then
     say "helm release (k3s-helm-release)"
-    local chart_repo chart chart_version
-    chart_repo="$(sed -n -E 's/^# chart_repo: *//p' "$rel/values.yaml")"
-    chart="$(sed -n -E 's/^# chart: *//p' "$rel/values.yaml")"
-    chart_version="$(sed -n -E 's/^# chart_version: *//p' "$rel/values.yaml")"
-    chart_repo="${chart_repo:-https://stefanprodan.github.io/podinfo}"
-    chart="${chart:-podinfo}"
-    helm --kubeconfig "$kc" upgrade --install podinfo "$chart" --repo "$chart_repo" \
-      ${chart_version:+--version "$chart_version"} -f "$rel/values.yaml" \
-      --namespace podinfo --create-namespace --wait --timeout 5m || return 1
+    # Copy the wrapper chart so --dependency-update doesn't write into the repo.
+    cp -R "$rel" "$work/k3s-helm-release"
+    helm --kubeconfig "$kc" upgrade --install podinfo "$work/k3s-helm-release" --dependency-update \
+      --namespace podinfo --create-namespace --atomic --wait --timeout 5m || return 1
+    kubectl --kubeconfig "$kc" -n podinfo rollout status deploy --timeout 120s || return 1
     kubectl --kubeconfig "$kc" -n podinfo get deploy,pods,svc || return 1
     helm --kubeconfig "$kc" uninstall podinfo --namespace podinfo --wait || return 1
   else
-    echo "templates/k3s-helm-release/values.yaml not found; helm step skipped"
+    echo "templates/k3s-helm-release/Chart.yaml not found; helm step skipped"
   fi
 }
 
