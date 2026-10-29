@@ -39,6 +39,7 @@ module "checkout_api" {
   db_multi_az          = true
   healthy_targets      = var.healthy_targets
   min_healthy_targets  = var.min_healthy_targets
+  public_ingress       = var.public_ingress
   rollout_check_script = "${path.module}/../../scripts/verify-rollout.sh"
   tags                 = local.tags
 }

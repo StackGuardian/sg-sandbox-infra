@@ -4,8 +4,8 @@ Two policies written in [Tirith](https://github.com/StackGuardian/tirith), Stack
 
 | File | What it checks | Action when it fails | Applies to |
 |---|---|---|---|
-| [`approve-destructive-changes.json`](approve-destructive-changes.json) | Any planned `delete` action on a `terraform_data` resource. A replace is planned as delete plus create, so replacements count too | Approval required: the run waits until an approver signs off. One rejection cancels it | Workflow group `platform-prod` |
-| [`deny-public-ingress.json`](deny-public-ingress.json) | Every resource whose `input.public_ingress` is set must have it `false` | Fail: the run stops | Workflow group `platform-ops` |
+| [`approve-destructive-changes.json`](approve-destructive-changes.json) | Any planned `delete` action on a `terraform_data` resource. A replace is planned as delete plus create, so replacements count too | Approval required: the run waits until an approver signs off. One rejection cancels it | Workflow groups `prod/shared`, `prod/eu-central-1` and `prod/us-east-2` |
+| [`deny-public-ingress.json`](deny-public-ingress.json) | Every resource whose `input.public_ingress` is set must have it `false` | Fail: the run stops | Every workflow group under `prod` |
 
 The scope, the action and the approvers are set on the StackGuardian policy, not in these files. These files hold only the rule body.
 
@@ -20,15 +20,15 @@ The scope, the action and the approvers are set on the StackGuardian policy, not
 ```sh
 pip install 'git+https://github.com/StackGuardian/tirith.git@1.2.1'
 
-cd stacks/network
+cd stacks/service
 tofu init
 tofu apply
-tofu plan -var vpc_cidr=10.41.0.0/16 -out=plan.tfplan
+tofu plan -var db_engine_version=16 -out=plan.tfplan
 tofu show -json plan.tfplan > plan.json
 
 tirith -policy-path ../../policies/approve-destructive-changes.json -input-path plan.json
 ```
 
-The `vpc_cidr` change replaces the network, so the approval rule fails, which on the platform holds the run for approval. With no `-var`, the plan has nothing to delete and the rule passes.
+The `db_engine_version` change replaces the database, so the approval rule fails, which on the platform holds the run for approval. With no `-var`, the plan has nothing to delete and the rule passes.
 
 `tirith lint policies/` checks the policy files themselves; CI runs it on every pull request.

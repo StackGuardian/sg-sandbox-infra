@@ -1,0 +1,93 @@
+{
+  "type": "object",
+  "properties": {
+    "region": {
+      "title": "AWS Region",
+      "type": "string",
+      "enum": [
+        "us-east-1",
+        "us-east-2",
+        "us-west-1",
+        "us-west-2",
+        "af-south-1",
+        "ap-east-1",
+        "ap-south-1",
+        "ap-south-2",
+        "ap-southeast-1",
+        "ap-southeast-2",
+        "ap-southeast-3",
+        "ap-southeast-4",
+        "ap-southeast-5",
+        "ap-northeast-1",
+        "ap-northeast-2",
+        "ap-northeast-3",
+        "ca-central-1",
+        "ca-west-1",
+        "eu-central-1",
+        "eu-central-2",
+        "eu-west-1",
+        "eu-west-2",
+        "eu-west-3",
+        "eu-south-1",
+        "eu-south-2",
+        "eu-north-1",
+        "il-central-1",
+        "me-south-1",
+        "me-central-1",
+        "sa-east-1"
+      ],
+      "default": "eu-central-1"
+    },
+    "cluster_name": {
+      "title": "Cluster name",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{1,38}[a-z0-9]$",
+      "default": "demo-eks"
+    },
+    "kubernetes_version": {
+      "title": "Kubernetes version",
+      "type": "string",
+      "enum": [
+        "1.29",
+        "1.30",
+        "1.31"
+      ],
+      "default": "1.31"
+    },
+    "node_instance_type": {
+      "title": "Node instance type",
+      "type": "string",
+      "default": "t3.medium"
+    },
+    "node_count": {
+      "title": "Node count",
+      "type": "number",
+      "minimum": 1,
+      "maximum": 10,
+      "default": 2
+    },
+    "node_count_max": {
+      "title": "Maximum node count",
+      "type": "number",
+      "minimum": 1,
+      "maximum": 20,
+      "default": 4
+    },
+    "endpoint_public_access": {
+      "title": "Public API endpoint",
+      "type": "boolean",
+      "default": false
+    },
+    "tags": {
+      "title": "Tags",
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      },
+      "default": {
+        "environment": "sandbox",
+        "managed_by": "stackguardian"
+      }
+    }
+  }
+}
