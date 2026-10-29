@@ -7,11 +7,11 @@ variable "region" {
 variable "name" {
   description = "Name prefix for every resource. A random suffix is added."
   type        = string
-  default     = "sg-sandbox-k3s"
+  default     = "sandbox-k3s"
 
   validation {
-    condition     = can(regex("^[a-z][a-z0-9-]{1,30}$", var.name))
-    error_message = "name must be 2-31 lowercase letters, digits or hyphens, starting with a letter."
+    condition     = can(regex("^[a-z][a-z0-9-]{1,30}$", var.name)) && !startswith(var.name, "sg-")
+    error_message = "name must be 2-31 lowercase letters, digits or hyphens, starting with a letter and not with \"sg-\" (AWS reserves it for security group names)."
   }
 }
 
