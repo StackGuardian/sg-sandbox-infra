@@ -28,6 +28,7 @@ resource "terraform_data" "database" {
     backup_retention    = 14
     deletion_protection = true
     tags                = var.tags
+    public_ingress      = false
   }
 
   # A major engine upgrade is a replacement, not an in-place change.
@@ -36,16 +37,17 @@ resource "terraform_data" "database" {
 
 resource "terraform_data" "service" {
   input = {
-    name          = var.name
-    environment   = var.environment
-    image         = "registry.example.com/${var.name}:${var.image_tag}"
-    image_tag     = var.image_tag
-    replica_count = var.replica_count
-    cpu           = var.cpu
-    memory        = var.memory
-    target_group  = terraform_data.load_balancer.output.name
-    database      = terraform_data.database.output.name
-    tags          = var.tags
+    name           = var.name
+    environment    = var.environment
+    image          = "registry.example.com/${var.name}:${var.image_tag}"
+    image_tag      = var.image_tag
+    replica_count  = var.replica_count
+    cpu            = var.cpu
+    memory         = var.memory
+    target_group   = terraform_data.load_balancer.output.name
+    database       = terraform_data.database.output.name
+    tags           = var.tags
+    public_ingress = false
   }
 }
 
@@ -59,6 +61,7 @@ resource "terraform_data" "autoscaling" {
     target_cpu_percent   = 60
     scale_in_cooldown_s  = 300
     scale_out_cooldown_s = 60
+    public_ingress       = false
   }
 }
 

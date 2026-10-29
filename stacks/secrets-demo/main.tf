@@ -18,8 +18,9 @@ locals {
 # Release guard: during a change freeze every plan fails before anything moves.
 resource "terraform_data" "change_guard" {
   input = {
-    stack       = "secrets-demo"
-    environment = var.environment
+    stack          = "secrets-demo"
+    environment    = var.environment
+    public_ingress = false
   }
 
   lifecycle {
