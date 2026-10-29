@@ -45,3 +45,9 @@ variable "change_freeze" {
   type        = bool
   default     = false
 }
+
+variable "public_ingress" {
+  description = "Expose the checkout-api load balancer to the internet. The deny-public-ingress policy fails any plan that sets it."
+  type        = bool
+  default     = false
+}

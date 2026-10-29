@@ -7,10 +7,11 @@ resource "terraform_data" "load_balancer" {
   input = {
     name           = "${var.name}-alb"
     environment    = var.environment
-    scheme         = "internet-facing"
+    scheme         = var.public_ingress ? "internet-facing" : "internal"
     listener_port  = 443
     tls_policy     = "TLS13-1-2-2021-06"
-    public_ingress = false
+    public_ingress = var.public_ingress
+    ingress_cidrs  = var.public_ingress ? ["0.0.0.0/0"] : var.internal_cidrs
     tags           = var.tags
   }
 }

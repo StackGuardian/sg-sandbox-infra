@@ -73,6 +73,18 @@ variable "rollout_check_script" {
   type        = string
 }
 
+variable "public_ingress" {
+  description = "Accept traffic on the load balancer from the internet instead of the internal network only."
+  type        = bool
+  default     = false
+}
+
+variable "internal_cidrs" {
+  description = "Internal ranges allowed to reach the load balancer when public_ingress is false."
+  type        = list(string)
+  default     = ["10.0.0.0/8"]
+}
+
 variable "tags" {
   description = "Tags applied to every object."
   type        = map(string)
